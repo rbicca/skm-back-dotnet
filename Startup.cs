@@ -1,3 +1,5 @@
+using skm_back_dotnet.Services;
+
 namespace skm_back_dotnet;
 
 public class Startup
@@ -12,11 +14,15 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
+
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c => {
-            c.SwaggerDoc("v1.0", new() { Title = "API Softkuka" , Version = "v1.0"} ); 
+            c.SwaggerDoc("v1", new() { Title = "API Softkuka" , Version = "v1"} ); 
         });
+
+        //Configurações de DI
+        services.AddSingleton<IRepository, InMemoryRepository>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
