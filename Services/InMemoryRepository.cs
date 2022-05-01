@@ -24,5 +24,10 @@ namespace skm_back_dotnet.Services
         public Genre GetGenreById(int Id){
             return _genres.FirstOrDefault(i => i.Id == Id);
         }
+
+        public void AddGenre(Genre genre){
+            genre.Id = _genres.Max(x => x.Id) + 1;
+            _genres.Add(genre);
+        }
     }
 }

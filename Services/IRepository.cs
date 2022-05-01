@@ -6,5 +6,6 @@ namespace skm_back_dotnet.Services
     {
          public Task<List<Genre>> GetAllGenres();
          public Genre GetGenreById(int Id);
+         public void AddGenre(Genre genre);
     }
 }
