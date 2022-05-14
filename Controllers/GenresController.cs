@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using skm_back_dotnet.Entities;
 using skm_back_dotnet.Filters;
 
@@ -11,10 +12,12 @@ namespace skm_back_dotnet.Controllers
     public class GenresController : ControllerBase
     {
         private readonly ILogger<GenresController> logger;
+        private readonly ApplicationDbContext context;
 
-        public GenresController(ILogger<GenresController> logger)
+        public GenresController(ILogger<GenresController> logger, ApplicationDbContext context)
         {
             this.logger = logger;
+            this.context = context;
         }
 
         //Níveis de log: Critical - Error - Warning - Information - Debug - Trace
@@ -33,7 +36,10 @@ namespace skm_back_dotnet.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Genre>>> Get(){
             logger.LogInformation("Consultando todos os gênreros");
-            return new List<Genre>(){ new Genre(){ Id=1, Name="Comédia" } };
+            
+            //return new List<Genre>(){ new Genre(){ Id=1, Name="Comédia" } };
+
+            return await context.Genres.ToListAsync();
         }
 
         [HttpGet("{Id:int}")]
@@ -44,9 +50,11 @@ namespace skm_back_dotnet.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody] Genre genre)
+        public async Task<ActionResult> Post([FromBody] Genre genre)
         {
-            throw new NotImplementedException();
+            context.Genres.Add(genre);
+            await context.SaveChangesAsync();
+            return NoContent();
         }
 
         [HttpPut]
