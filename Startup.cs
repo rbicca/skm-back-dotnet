@@ -39,6 +39,9 @@ public class Startup
                 builder.WithOrigins(frontendURL).AllowAnyMethod().AllowAnyHeader();
             });
         });
+
+        services.AddAutoMapper(typeof(Startup));
+
     }
 
     //Configura pipeline de execução

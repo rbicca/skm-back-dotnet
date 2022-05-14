@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using skm_back_dotnet.Entities;
 using skm_back_dotnet.Filters;
+using skm_back_dotnet.DTOs;
+using AutoMapper;
 
 namespace skm_back_dotnet.Controllers
 {
@@ -13,9 +15,11 @@ namespace skm_back_dotnet.Controllers
     {
         private readonly ILogger<GenresController> logger;
         private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
 
-        public GenresController(ILogger<GenresController> logger, ApplicationDbContext context)
+        public GenresController(ILogger<GenresController> logger, ApplicationDbContext context, IMapper mapper)
         {
+            this.mapper = mapper;
             this.logger = logger;
             this.context = context;
         }
@@ -34,12 +38,21 @@ namespace skm_back_dotnet.Controllers
         // }
 
         [HttpGet]
-        public async Task<ActionResult<List<Genre>>> Get(){
+        public async Task<ActionResult<List<GenreDTO>>> Get()
+        {
+
+            //Bem, lição de arquitetura do nosso amigo Gavilan. Nunca expor a entidade, e sempre um DTO
+            //Como o mapeamento prop a prop pode ficar exaustivo, ele trabalha com um pacote auto-mapper
+            //dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
+
             logger.LogInformation("Consultando todos os gênreros");
-            
+
             //return new List<Genre>(){ new Genre(){ Id=1, Name="Comédia" } };
 
-            return await context.Genres.ToListAsync();
+            var genres = await context.Genres.ToListAsync();
+            
+            return mapper.Map<List<GenreDTO>>(genres);
+
         }
 
         [HttpGet("{Id:int}")]
@@ -50,8 +63,9 @@ namespace skm_back_dotnet.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Genre genre)
+        public async Task<ActionResult> Post([FromBody] GenreCreationDTO genreCreationDTO)
         {
+            var genre = mapper.Map<Genre>(genreCreationDTO);
             context.Genres.Add(genre);
             await context.SaveChangesAsync();
             return NoContent();
