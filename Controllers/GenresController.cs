@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using skm_back_dotnet.Entities;
-using skm_back_dotnet.Services;
 using skm_back_dotnet.Filters;
 
 namespace skm_back_dotnet.Controllers
@@ -11,60 +10,55 @@ namespace skm_back_dotnet.Controllers
     [ApiController]         //Força a inferencia binding-parametros-modelstate(valid) automaticamente
     public class GenresController : ControllerBase
     {
-        private readonly IRepository repository;
         private readonly ILogger<GenresController> logger;
 
-        public GenresController(IRepository repository, ILogger<GenresController> logger)
+        public GenresController(ILogger<GenresController> logger)
         {
             this.logger = logger;
-            this.repository = repository;
         }
 
         //Níveis de log: Critical - Error - Warning - Information - Debug - Trace
         //Configuramos o namespace e o nível de log em appsettings.json (ou development)
         //Podemos configurar providers de erro(saida) em Program.cs em ConfigureWebHostsDefaults
 
+        // [HttpGet]
+        // //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // [ServiceFilter(typeof(TheActionFilter))]            //Não esquecer de registrar filtro em Startup - ConfigureServices
+        // public async Task<ActionResult<List<Genre>>> Get()
+        // {
+        //     logger.LogInformation("Consultando todos os gênreros");
+        //     return await repository.GetAllGenres();
+        // }
+
         [HttpGet]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [ServiceFilter(typeof(TheActionFilter))]            //Não esquecer de registrar filtro em Startup - ConfigureServices
-        public async Task<ActionResult<List<Genre>>> Get()
-        {
+        public async Task<ActionResult<List<Genre>>> Get(){
             logger.LogInformation("Consultando todos os gênreros");
-            return await repository.GetAllGenres();
+            return new List<Genre>(){ new Genre(){ Id=1, Name="Comédia" } };
         }
 
         [HttpGet("{Id:int}")]
-        [ServiceFilter(typeof(TheActionFilter))]  
+        //[ServiceFilter(typeof(TheActionFilter))]  
         public ActionResult<Genre> Get(int Id)
         {
-            logger.LogDebug("GetGenreById será executado");
-            var genre = repository.GetGenreById(Id);
-            if (genre == null)
-            {
-                logger.LogWarning($"Gênero com Id {Id} não encontrado");
-                //throw new ApplicationException();
-                return NotFound();
-            }
-            return genre;
+            throw new NotImplementedException();
         }
 
         [HttpPost]
         public ActionResult Post([FromBody] Genre genre)
         {
-            repository.AddGenre(genre);
-            return NoContent();
+            throw new NotImplementedException();
         }
 
         [HttpPut]
         public ActionResult Put()
         {
-            return NoContent();
+            throw new NotImplementedException();
         }
 
         [HttpDelete]
         public ActionResult Delete()
         {
-            return NoContent();
+            throw new NotImplementedException();
         }
 
     }
