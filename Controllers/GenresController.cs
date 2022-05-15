@@ -6,6 +6,7 @@ using skm_back_dotnet.Entities;
 using skm_back_dotnet.Filters;
 using skm_back_dotnet.DTOs;
 using AutoMapper;
+using skm_back_dotnet.Helpers;
 
 namespace skm_back_dotnet.Controllers
 {
@@ -38,18 +39,19 @@ namespace skm_back_dotnet.Controllers
         // }
 
         [HttpGet]
-        public async Task<ActionResult<List<GenreDTO>>> Get()
+        public async Task<ActionResult<List<GenreDTO>>> Get([FromQuery] PaginationDTO paginationDTO)
         {
 
             //Bem, lição de arquitetura do nosso amigo Gavilan. Nunca expor a entidade, e sempre um DTO
             //Como o mapeamento prop a prop pode ficar exaustivo, ele trabalha com um pacote auto-mapper
             //dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
 
-            logger.LogInformation("Consultando todos os gênreros");
-
+            //logger.LogInformation("Consultando todos os gênreros");
             //return new List<Genre>(){ new Genre(){ Id=1, Name="Comédia" } };
 
-            var genres = await context.Genres.ToListAsync();
+            var queryable = context.Genres.AsQueryable();
+            await HttpContext.InsertParametersPaginationInHeader(queryable);
+            var genres = await queryable.OrderBy(x => x.Name).Paginate(paginationDTO).ToListAsync();
             
             return mapper.Map<List<GenreDTO>>(genres);
 

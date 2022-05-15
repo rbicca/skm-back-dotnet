@@ -1,3 +1,4 @@
+using EntityFrameworkCore.UseRowNumberForPaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using skm_back_dotnet.APIBehavior;
@@ -17,8 +18,12 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<ApplicationDbContext>(options => {
-            options.UseSqlServer(Configuration.GetConnectionString("CS"));
+            options.UseSqlServer(Configuration.GetConnectionString("CS"), builder => builder.UseRowNumberForPaging());
         });
+        //Uma observação sobre paginação do EF, usando o glorioso SQL 2008
+        //Criamos uma extenção de paginação que usa Skip e Take, que só funciona no SQL 2017 em diante
+        // Instalei o pacote dotnet add package EntityFrameworkCore.UseRowNumberForPaging --version 0.3.0
+        // E ativei o builder na configuração do serviço
 
         services.AddControllers(options => {
             options.Filters.Add(typeof(TheExceptionFilter));
@@ -36,7 +41,9 @@ public class Startup
         services.AddCors(options => {
             var frontendURL = Configuration.GetValue<string>("frontend_url");
             options.AddDefaultPolicy(builder => {
-                builder.WithOrigins(frontendURL).AllowAnyMethod().AllowAnyHeader();
+                builder
+                    .WithOrigins(frontendURL).AllowAnyMethod().AllowAnyHeader()
+                    .WithExposedHeaders(new string[]{ "totalAmountOfRecords" });
             });
         });
 
