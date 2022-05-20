@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using skm_back_dotnet.APIBehavior;
 using skm_back_dotnet.Filters;
+using skm_back_dotnet.Helpers;
 
 namespace skm_back_dotnet;
 
@@ -48,6 +49,7 @@ public class Startup
         });
 
         services.AddAutoMapper(typeof(Startup));
+        services.AddScoped<IFileStorageService, AzureStorageService>(); 
 
     }
 
