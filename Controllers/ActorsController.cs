@@ -34,12 +34,12 @@ namespace skm_back_dotnet.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] ActorCreationDTO actorCreationDTO){
-            throw new NotImplementedException();
+        public async Task<ActionResult> Post([FromForm] ActorCreationDTO actorCreationDTO){
+            return NoContent();
         }
 
         [HttpPut]
-        public async Task<ActionResult> Put([FromBody] ActorCreationDTO actorCreationDTO){
+        public async Task<ActionResult> Put([FromForm] ActorCreationDTO actorCreationDTO){
             throw new NotImplementedException();
         }
 
