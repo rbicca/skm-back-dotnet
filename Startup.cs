@@ -50,6 +50,8 @@ public class Startup
 
         services.AddAutoMapper(typeof(Startup));
         services.AddScoped<IFileStorageService, AzureStorageService>(); 
+        //services.AddScoped<IFileStorageService, InAppStorageService>(); 
+        services.AddHttpContextAccessor();
 
     }
 
@@ -64,6 +66,8 @@ public class Startup
         }
 
         app.UseHttpsRedirection();
+
+        app.UseStaticFiles();
 
         app.UseRouting();   
 
