@@ -1,6 +1,9 @@
+using AutoMapper;
 using EntityFrameworkCore.UseRowNumberForPaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using skm_back_dotnet.APIBehavior;
 using skm_back_dotnet.Filters;
 using skm_back_dotnet.Helpers;
@@ -19,7 +22,13 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<ApplicationDbContext>(options => {
-            options.UseSqlServer(Configuration.GetConnectionString("CS"), builder => builder.UseRowNumberForPaging());
+            options.UseSqlServer(Configuration.GetConnectionString("CS"), 
+                                  sqlOptions => {
+                                      sqlOptions.UseRowNumberForPaging();
+                                      sqlOptions.UseNetTopologySuite();
+
+                                  }
+                                );
         });
         //Uma observação sobre paginação do EF, usando o glorioso SQL 2008
         //Criamos uma extenção de paginação que usa Skip e Take, que só funciona no SQL 2017 em diante
@@ -49,8 +58,15 @@ public class Startup
         });
 
         services.AddAutoMapper(typeof(Startup));
+
+        services.AddSingleton(provider => new MapperConfiguration(config => {
+            var geometryFactory = provider.GetRequiredService<GeometryFactory>();
+            config.AddProfile(new AutoMapperProfiles(geometryFactory));
+        }).CreateMapper());
+
         services.AddScoped<IFileStorageService, AzureStorageService>(); 
         //services.AddScoped<IFileStorageService, InAppStorageService>(); 
+        services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
         services.AddHttpContextAccessor();
 
     }
